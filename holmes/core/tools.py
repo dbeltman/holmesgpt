@@ -286,7 +286,7 @@ class StaticPrerequisite(BaseModel):
 
 
 class CallablePrerequisite(BaseModel):
-    callable: Callable[[dict[str, Any]], Tuple[bool, str]]
+    callable: Callable[[], Tuple[bool, str]]
 
 
 class ToolsetCommandPrerequisite(BaseModel):
