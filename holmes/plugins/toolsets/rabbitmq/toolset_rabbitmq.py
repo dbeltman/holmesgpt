@@ -1,8 +1,11 @@
-import os
 import logging
+import os
 from typing import Any, List, Optional, Tuple
+from urllib.parse import urljoin
 
 from pydantic import BaseModel
+from requests import RequestException  # type: ignore
+
 from holmes.core.tools import (
     CallablePrerequisite,
     StructuredToolResult,
@@ -12,9 +15,6 @@ from holmes.core.tools import (
     Toolset,
     ToolsetTag,
 )
-from requests import RequestException  # type: ignore
-from urllib.parse import urljoin
-
 from holmes.plugins.toolsets.rabbitmq.api import (
     ClusterConnectionStatus,
     RabbitMQClusterConfig,
@@ -142,31 +142,9 @@ class RabbitMQToolset(Toolset):
         )
         self._load_llm_instructions(jinja_template=f"file://{template_file_path}")
 
-    def prerequisites_callable(self, config: dict[str, Any]) -> Tuple[bool, str]:
-        if not config or not config.get("clusters"):
-            # Attempt to load from environment variables as fallback
-            env_url = os.environ.get("RABBITMQ_MANAGEMENT_URL")
-            env_user = os.environ.get("RABBITMQ_USERNAME", "guest")
-            env_pass = os.environ.get("RABBITMQ_PASSWORD", "guest")
-            if not env_url:
-                return (
-                    False,
-                    "RabbitMQ toolset is misconfigured. 'management_url' is required.",
-                )
-            config = {
-                "clusters": [
-                    {
-                        "id": "rabbitmq",
-                        "management_url": env_url,
-                        "username": env_user,
-                        "password": env_pass,
-                    }
-                ]
-            }
-            logging.info("Loaded RabbitMQ config from environment variables.")
-
+    def prerequisites_callable(self) -> Tuple[bool, str]:
         try:
-            self.config = RabbitMQConfig(**config)
+            self.init_config()
         except Exception as e:
             return (False, f"Failed to parse RabbitMQ configuration: {str(e)}")
 
@@ -220,3 +198,29 @@ class RabbitMQToolset(Toolset):
             ]
         )
         return example_config.model_dump()
+
+    def init_config(self):
+        config = self.config
+        if not config or not config.get("clusters"):
+            # Attempt to load from environment variables as fallback
+            env_url = os.environ.get("RABBITMQ_MANAGEMENT_URL")
+            env_user = os.environ.get("RABBITMQ_USERNAME", "guest")
+            env_pass = os.environ.get("RABBITMQ_PASSWORD", "guest")
+            if not env_url:
+                return (
+                    False,
+                    "RabbitMQ toolset is misconfigured. 'management_url' is required.",
+                )
+            config = {
+                "clusters": [
+                    {
+                        "id": "rabbitmq",
+                        "management_url": env_url,
+                        "username": env_user,
+                        "password": env_pass,
+                    }
+                ]
+            }
+            logging.info("Loaded RabbitMQ config from environment variables.")
+
+        self.config = RabbitMQConfig(**config)
