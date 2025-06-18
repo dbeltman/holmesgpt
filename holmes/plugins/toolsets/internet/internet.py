@@ -245,9 +245,7 @@ class InternetBaseToolset(Toolset):
         )
 
     def prerequisites_callable(self) -> Tuple[bool, str]:
-        if not self.config:
-            return True, ""
-        self.additional_headers = self.config.get("additional_headers", {})
+        self.init_config()
         return True, ""
 
     def get_example_config(self) -> Dict[str, Any]:
