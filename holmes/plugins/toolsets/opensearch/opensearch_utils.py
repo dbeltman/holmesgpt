@@ -44,7 +44,7 @@ class BaseOpenSearchToolset(Toolset):
             )
             return opensearch_health_check(self.config)
         else:
-            self.config = OpenSearchIndexConfig(**self.config)
+            self.config = OpenSearchIndexConfig(**self.config)  # type: ignore
             return opensearch_health_check(self.config)
 
     @property

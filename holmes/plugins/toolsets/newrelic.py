@@ -221,6 +221,9 @@ class NewRelicToolset(Toolset):
         return {}
 
     def init_config(self):
+        if not self.config:
+            logging.error("The New Relic toolset is not configured")
+            return
         nr_config = NewrelicConfig(**self.config)
         self.nr_account_id = nr_config.nr_account_id
         self.nr_api_key = nr_config.nr_api_key

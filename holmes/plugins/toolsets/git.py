@@ -88,6 +88,11 @@ class GitToolset(Toolset):
             return False, ""
 
     def init_config(self):
+        if not self.config and not (
+            os.getenv("GIT_REPO") and os.getenv("GIT_CREDENTIALS")
+        ):
+            logging.error("Missing one or more required Git configuration values.")
+            return
         self.git_repo = os.getenv("GIT_REPO") or self.config.get("git_repo")
         self.git_credentials = os.getenv("GIT_CREDENTIALS") or self.config.get(
             "git_credentials"

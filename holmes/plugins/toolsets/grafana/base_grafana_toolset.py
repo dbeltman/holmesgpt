@@ -53,4 +53,7 @@ class BaseGrafanaToolset(Toolset):
         return example_config.model_dump()
 
     def init_config(self):
+        if not self.config:
+            logging.error("The grafana toolset is not configured")
+            return
         self._grafana_config = self.config_class(**self.config)

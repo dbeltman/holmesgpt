@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Optional, Tuple
 
 from holmes.core.tools import (
@@ -152,4 +153,7 @@ class CoralogixLogsToolset(BaseCoralogixToolset):
             return False, "Missing configuration field 'api_key'"
 
     def init_config(self):
+        if not self.config:
+            logging.error("The coralogix/logs toolset is not configured")
+            return
         self.config = CoralogixConfig(**self.config)
