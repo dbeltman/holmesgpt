@@ -22,3 +22,4 @@ curl -XPOST 127.0.0.1:8000/api/investigate -H "Content-Type: application/json" -
   \"include_tool_calls\": true,
   \"include_tool_call_results\": true
 }"
+
