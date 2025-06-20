@@ -11,6 +11,8 @@ on:
   push:
     # Publish semver tags as releases.
     tags: [ '*.*.*' ]
+    branches: 
+      - build
 
 env:
   # Use docker.io for Docker Hub if empty
